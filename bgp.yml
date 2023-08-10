@@ -1,0 +1,117 @@
+name: bgp
+
+topology:
+  defaults:
+    kind: vr-sros
+    image: vrnetlab/vr-sros:23.7.R1
+    license: ~/23.x_SR_OS_VSR-SIM_License.txt
+    type: sr-1
+
+  nodes:
+    R1:
+      config:
+        vars:
+          bgp_asn: 65540
+          isis_area: 16.0001
+          clab_system_ip: 10.16.10.1/32
+    R2:
+      config:
+        vars:
+          bgp_asn: 65540
+          isis_area: 16.0001
+          clab_system_ip: 10.16.10.2/32      
+    R3:
+      config:
+        vars:
+          bgp_asn: 65550
+          isis_area: 64.0001
+          clab_system_ip: 10.64.10.3/32      
+    R4:
+      config:
+        vars:
+          bgp_asn: 65550
+          isis_area: 64.0001
+          clab_system_ip: 10.64.10.4/32      
+    R5:
+      config:
+        vars:
+          bgp_asn: 65540
+          isis_area: 16.0001
+          clab_system_ip: 10.16.10.5/32      
+          loopbacks: [192.168.1.9/29, 192.168.1.25/29, 10.17.100.1/24, 10.17.101.1/24]  
+    R6:
+      config:
+        vars:
+          bgp_asn: 65540
+          isis_area: 16.0001
+          clab_system_ip: 10.16.10.6/32
+          loopbacks: [192.168.2.9/29, 192.168.2.25/29, 10.17.102.1/24, 10.17.103.1/24]      
+    R7:
+      config:
+        vars:
+          bgp_asn: 65550
+          isis_area: 64.0001
+          clab_system_ip: 10.64.10.7/32
+          loopbacks: [192.168.3.1/29, 192.168.3.17/29, 10.65.100.1/24, 10.65.101.1/24]      
+    R8:
+      config:
+        vars:
+          bgp_asn: 65550
+          isis_area: 64.0001  
+          clab_system_ip: 10.64.10.1/32
+          loopbacks: [192.168.4.1/29, 192.168.4.17/29, 10.65.102.1/24, 10.65.103.1/24]      
+
+  links:
+    - endpoints: [R1:eth1, R5:eth1]
+      vars:
+        port: [1/1/c1, 1/1/c1]
+        link_ip: [10.16.0.2/30, 10.16.0.1/30]
+        isis: true  
+    - endpoints: [R2:eth1, R6:eth1]
+      vars:
+        port: [1/1/c1, 1/1/c1]
+        link_ip: [10.16.0.6/30, 10.16.0.5/30]
+        isis: true      
+    - endpoints: [R3:eth1, R7:eth1]
+      vars:
+        port: [1/1/c1, 1/1/c1]
+        link_ip: [10.64.0.2/30, 10.64.0.1/30]
+        isis: true  
+    - endpoints: [R4:eth1, R8:eth1]
+      vars:
+        port: [1/1/c1, 1/1/c1]
+        link_ip: [10.64.0.6/30, 10.64.0.5/30]
+        isis: true      
+    - endpoints: [R1:eth2, R2:eth2]
+      vars:
+        port: [1/1/c2, 1/1/c2]
+        link_ip: [10.16.0.9/30, 10.16.0.10/30]
+        isis: true  
+    - endpoints: [R3:eth2, R4:eth2]
+      vars:
+        port: [1/1/c2, 1/1/c2]
+        link_ip: [10.64.0.9/30, 10.64.0.10/30]
+        isis: true      
+    - endpoints: [R5:eth3, R6:eth3]
+      vars:
+        port: [1/1/c3, 1/1/c3]
+        link_ip: [10.16.0.21/30, 10.16.0.22/30]
+        isis: true      
+    - endpoints: [R7:eth3, R8:eth3]
+      vars:
+        port: [1/1/c2, 1/1/c2]
+        link_ip: [10.64.0.21/30, 10.64.0.22/30]
+        isis: true
+    - endpoints: [R1:eth3, R3:eth3]
+      vars:
+        port: [1/1/c3, 1/1/c3]
+        link_ip: [10.2.0.1/24, 10.2.0.2/24]
+        isis: false
+    - endpoints: [R2:eth3, R4:eth3]
+      vars:
+        port: [1/1/c3, 1/1/c3]
+        link_ip: [10.4.0.2/24, 10.4.0.1/24]
+        isis: false
+
+          
+      

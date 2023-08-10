@@ -1,0 +1,46 @@
+{{ expect .clab_system_ip "ip" }}
+{{/* Configure system interface */}}
+/configure router interface "system" ipv4 primary address {{ ip .clab_system_ip }}
+/configure router interface "system" ipv4 primary prefix-length {{ ipmask .clab_system_ip }}
+/configure router interface "system" admin-state enable
+
+{{/* Configure ECMP */}}
+/configure router ecmp 2
+{{/* Configure Loopback interfaces */}}
+{{- if $.loopbacks }}
+{{ range $idx, $loopback := $.loopbacks }}
+/configure router interface loopback{{ $idx}} ipv4 primary address {{ ip $loopback }}
+/configure router interface loopback{{ $idx}} ipv4 primary prefix-length {{ ipmask $loopback }}
+/configure router interface loopback{{ $idx}} loopback
+/configure router interface loopback{{ $idx}} admin-state enable
+{{- end }}
+{{- end }}
+
+{{/* Configure P-to-P interfaces */}}
+{{ range $name, $link := .clab_links }}
+{{- if $link.port }}
+/ configure port {{ $link.port}} connector breakout c1-100g
+/ configure port {{ $link.port}} admin-state enable
+/ configure port {{ $link.port}}/1 admin-state enable
+/ configure router interface {{ $link.clab_link_name }} port {{ $link.port}}/1
+/ configure router interface {{ $link.clab_link_name }} ipv4 primary address {{ ip $link.link_ip }} prefix-length {{ ipmask $link.link_ip }}
+/ configure router interface {{ $link.clab_link_name }} admin-state enable
+{{- end }}
+{{- end -}}
+
+
+{{/* Configure IS-IS */}}
+{{- if $.isis_area }}
+/ configure router isis level-capability 2 
+/ configure router isis area-address {{ $.isis_area }} 
+/ configure router isis interface "system" level-capability 2
+/ configure router isis interface "system" admin-state enable 
+{{ range $name, $link := .clab_links }}
+{{- if and ($link.port) (eq $link.isis true) }}
+/ configure router isis interface {{ $link.clab_link_name }} admin-state enable 
+/ configure router isis interface {{ $link.clab_link_name }} interface-type point-to-point 
+/ configure router isis interface {{ $link.clab_link_name }} level-capability 2 
+{{- end }}
+{{- end }}
+/ configure router isis admin-state enable
+{{- end -}}
